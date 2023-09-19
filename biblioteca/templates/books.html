@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'css/multi-select.css' %}">
+<link rel="stylesheet" href="{% static 'css/books.css' %}">
+<link rel="stylesheet" href="{% static 'css/dropdown.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/cropper.min.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container pt-5">
+
+    <!-- Borrow modal -->
+
+    <div class="modal fade" id="borrow-modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="form" method="POST" action="{% url 'books_borrow' %}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">Realizar emprestimo</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Título
+                        <input id="title-borrow" type="text" name="title" class="form-control" required><br>
+                        <input id="book-borrow"  type="text" name="book" hidden>
+                        Usuário<br>
+                        <select class="ui search dropdown col-12" name="user" required>
+                            <option value="">Selecione um usuário</option>
+                            {% for user in users %}
+                            <option value="{{user.id}}">{{user.name}}</option>
+                            {% endfor %}
+                        </select><br>
+                        <br>Duração do emprestimo (dias)
+                        <input id="duration" type="number" min="1" name="duration" class="form-control" value="7" required><br>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Confirmar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Devolution modal -->
+
+    <div class="modal fade" id="devolution-modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Confirmar devolução?</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Emprestado para:
+                    <input id="borrow-user" type="text" name="borrow-user" class="form-control mb-1" disabled><br>
+                    Data do emprestimo:
+                    <input id="borrow-date" type="text" name="borrow-date" class="form-control mb-1" disabled><br>
+                    Prazo de devolução:
+                    <input id="borrow-due" type="text" name="borrow-due" class="form-control mb-1" disabled><br>
+                    Após a confirmação, o emprestimo será finalizado e o livro ficará disponível.
+                </div>
+                <div class="modal-footer">
+                    <a id="devolution-confirm"><button type="button" class="btn btn-success">Confirmar</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete modal -->
+
+    <div class="modal fade" id="delete-modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Você tem certeza?</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Após a exclusão, qualquer emprestimo pendente ele será dado como entregue e não será possível recuperar os dados do livro.
+                </div>
+                <div class="modal-footer">
+                    <a id="delete-confirm"><button type="button" class="btn btn-danger">Excluir</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete lock modal -->
+
+    <div class="modal fade" id="delete-lock-modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Emprestimo pendente</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Não é possível excluir o livro, pois há um emprestimo pendente, para continuar é necessário finalizar o emprestimo.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create modal -->
+
+    <div class="modal fade" id="create-modal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="form-create" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="modal-title"></h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="cover-group" class="row mb-2">
+                            <div class="col-4">
+                                <img id="cover-thumb" src="{% static 'img/book.jpg' %}" class="img-thumbnail p-1">
+                                <button id="button-cover" class="form-control bg-primary text-white mt-3 col-12">Inserir capa</button><br>
+                            </div>
+                            <div id="info-group" class="col-8">
+                                Título
+                                <input id="title" type="text" name="title" class="form-control" placeholder="" required><br>
+                                Autor
+                                <input id="author" type="text" name="author" class="form-control" placeholder="" required><br>
+                                Descrição
+                                <textarea id="description" type="text" rows="4" name="description" class="form-control" placeholder="" required></textarea><br>
+                            </div>
+                        </div>
+                        <input id="input-cover" class="form-control" type="file" hidden>
+                        Categoria
+                        <select multiple="multiple" name="category" id="category" class="mb-3" required>
+                            {% for category in categories %}
+                            <option value="{{category.id}}">{{category.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <a id="create-confirm"><button type="submit" class="btn btn-success">Confirmar</button></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cover modal -->
+
+    <div class="modal fade" id="cover-modal" style="background-color: rgba(0, 0, 0, 0.692);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Ajuste de capa</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row">
+                    <div class="col-2"></div>
+                    <div class="col-8 text-center">
+                        <img id="cover" class="img-thumbnail col-8 p-1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="confirm-crop" class="btn btn-success">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-3 mt-sm-4">
+        <div class="col-12 mb-3 col-lg-6 mb-lg-0">
+            <div class="form-floating">
+                <input type="text" class="form-control" id="search" placeholder="Pesquisar titulo ou autor">
+                <label for="search" style="color: rgb(146, 146, 146);">Pesquisar titulo ou autor</label>
+            </div>
+        </div>
+        <div class="col-4 col-lg-2">
+            <div class="form-floating">
+                <select name="category-filter" class="form-select" id="category-filter" required>
+                    <option value="" selected>Todos</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                <label for="category-filter">Categoria</label>
+            </div>
+        </div>
+        <div class="col-4 col-lg-2">
+            <div class="form-floating">
+                <select name="available-filter" class="form-select" id="available-filter" required>
+                    <option value="" selected> Todos </option>
+                    <option value="1"> Disponível </option>
+                    <option value="0"> Emprestado </option>
+                </select>
+                <label for="available-filter">Estado</label>
+            </div>
+        </div>
+        <div class="col-4 col-lg-2">
+            <button class="btn btn-success col-12 create h-100" data-bs-toggle="modal" data-bs-target="#create-modal">Adicionar Livro</button>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            <table class="table table-hover text-center">
+                <thead style="background-color: #3d3025; color: white">
+                    <tr>
+                        <th scope="col" class="col-available" style="width: 9%;"></th>
+                        <th scope="col" style="width: 15%;">Título</th>
+                        <th scope="col" style="width: 13%;">Autor</th>
+                        <th scope="col" class="col-description">Descrição</th>
+                        <th scope="col" style="width: 17%;" class="col-category">Categorias</th>
+                        <th scope="col" style="width: 4%;"></th>
+                        <th scope="col" style="width: 4%;"></th>
+                        <th scope="col" style="width: 4%;"></th>
+                    </tr>
+                </thead>
+                <tbody id="books" class="table-light">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/jquery.multi-select.js' %}"></script>
+<script src="{% static 'js/semantic.min.js' %}"></script>
+<script src="{% static 'js/dropdown.min.js' %}"></script>
+<script src="{% static 'js/cropper.min.js' %}"></script>
+<script src="{% static 'js/books.js' %}"></script>
+{% endblock %}

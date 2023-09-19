@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<style>
+    table {
+        table-layout: fixed;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <script>
+        $(document).ready(function() {
+            $(".delete").click(function(e) {
+                e.preventDefault();
+                $("#delete-confirm").attr("href", $(this).attr("href"));
+            });
+        });
+    </script>
+
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-12">
+                <table class="table table-hover text-center">
+                    <thead style="background-color: #3d3025; color: white">
+                        <tr>
+                            <th scope="col">Responsável</th>
+                            <th scope="col">Livro</th>
+                            <th scope="col">Emprestado em</th>
+                            <th scope="col">Prazo de devolução</th>
+                            <th scope="col">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-light">
+                    {% for transaction in transactions %}
+                        <tr class="align-middle">
+                            <td>{{transaction.user.name  |truncatechars:30}}</td>
+                            <td>{{transaction.book_title |truncatechars:30}}</td>
+                            <td>{{transaction.issued_on  | date:"d/m/Y" }}</td>
+                            <td>{{transaction.due_date   | date:"d/m/Y" }}</td>
+                            {% if transaction.active %}
+                            <td>Pendente</td>
+                            {% else %}
+                            <td>Entregue</td>
+                            {% endif %}
+                            <!--
+                            <td>
+                                <a href="{% url 'books_transaction_delete' transaction.id %}" class="delete" data-bs-toggle="modal" data-bs-target="#delete-modal"><svg width="23" fill="#A40E1E" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M0 14.545L1.455 16 8 9.455 14.545 16 16 14.545 9.455 8 16 1.455 14.545 0 8 6.545 1.455 0 0 1.455 6.545 8z" fill-rule="evenodd"></path> </g></svg></a>
+                            </td>
+                            -->
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,87 @@
+@media (max-width: 250px){
+    .hexagon-item{
+        scale: 0.6;
+        margin: 0 -30px;
+    }
+    .logo{
+        scale: 0.5;
+        margin-left: -45px;
+        margin-top: -95px;
+        text-align: center;
+    }
+    .menu1{
+        display: none;
+    }
+}
+@media (min-width: 251px) and (max-width: 300px){
+    .hexagon-item{
+        scale: 0.6;
+        margin: 0 -35px;
+    }
+    .logo{
+        scale: 0.6;
+        margin-left: -45px;
+        margin-top: -95px;
+        text-align: center;
+    }
+    .menu1{
+        display: none;
+    }
+}
+@media (min-width: 301px) and (max-width: 767px){
+    .hexagon-item{
+        scale: 0.8;
+        margin: 0 -15px;
+    }
+    .logo{
+        scale: 0.7;
+        margin-left: -10px;
+        margin-top: -95px;
+        text-align: center;
+    }
+    .menu1{
+        display: none;
+    }
+}
+
+@media (min-width: 768px){
+    .menu2{
+        display: none;
+    }
+}
+ 
+@media (min-width: 768px) and (max-width: 991px){ 
+    .menu{
+        margin-top: 125px;
+    }
+    .hexagon-item{
+        scale: 0.8;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199px){ 
+    .menu{
+        margin-top: 100px;
+    }
+    .hexagon-item{
+        margin: 0 10px;
+    }
+}
+ 
+@media (min-width: 1200px) and (max-width: 1399px){ 
+    .menu{
+        margin-top: 100px;
+    }
+    .hexagon-item{
+        margin: 0 10px;
+    }
+}
+
+@media (min-width: 1400px) { 
+    .menu{
+        margin-top: 100px;
+    }
+    .hexagon-item{
+        margin: 0 10px;
+    }
+}

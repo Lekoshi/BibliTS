@@ -1,0 +1,21 @@
+table {
+    table-layout: fixed;
+}
+.ms-container {
+    width: 100% !important;
+}
+
+@media (max-width: 500px){ 
+    .col-available{
+        display: none;
+    }
+}
+
+@media (max-width: 991px){ 
+    .col-description{
+        display: none;
+    }
+    .col-category{
+        display: none;
+    }
+}

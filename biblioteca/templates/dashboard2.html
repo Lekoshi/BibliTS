@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block header %}
+    <link rel="stylesheet" href="{% static 'css/hexagons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="font-family: Nexa">
+        <div class="row">
+            <div class="col-12 text-center logo">
+                <p style="font-family: Book; font-size: 15em; color:#3d3025">BibliTS</p>
+            </div>
+        </div>
+        <div class="row menu1">
+            <div class="menu d-flex justify-content-center position-absolute top-50 start-50 translate-middle">
+                <div class="hexagon-item">
+                    <div class="hex-item">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <a href="{% url 'books_view' %}" class="hex-content">
+                        <span class="hex-content-inner" style="color:#3d3025">
+                            <span class="icon">
+                                <i class="fa fa-book"></i>
+                            </span>
+                            <span>Livros</span>
+                        </span>
+                        <svg class="p-2"  viewBox="0 0 173.20508075688772 200" height="200" width="174" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M86.60254037844386 0L173.20508075688772 50L173.20508075688772 150L86.60254037844386 200L0 150L0 50Z" fill="#a98467"></path></svg>
+                    </a>
+                </div>
+                <div class="hexagon-item">
+                    <div class="hex-item">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <a href="{% url 'users_view' %}" class="hex-content">
+                        <span class="hex-content-inner" style="color:#3d3025">
+                            <span class="icon">
+                                <i class="fa fa-users"></i>
+                            </span>
+                            <span>Usuários</span>
+                        </span>
+                        <svg class="p-2" viewBox="0 0 173.20508075688772 200" height="200" width="174" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M86.60254037844386 0L173.20508075688772 50L173.20508075688772 150L86.60254037844386 200L0 150L0 50Z" fill="#a98467"></path></svg>
+                    </a>
+                </div>
+                <div class="hexagon-item">
+                    <div class="hex-item">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <a href="{% url 'books_transaction_view' %}" class="hex-content">
+                        <span class="hex-content-inner" style="color:#3d3025">
+                            <span class="icon">
+                                <i class="fa fa-handshake"></i>
+                            </span>
+                            <span>Emprestimos</span>
+                        </span>
+                        <svg class="p-2"  viewBox="0 0 173.20508075688772 200" height="200" width="174" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M86.60254037844386 0L173.20508075688772 50L173.20508075688772 150L86.60254037844386 200L0 150L0 50Z" fill="#a98467"></path></svg>
+                    </a>
+                </div>
+                <div class="hexagon-item">
+                    <div class="hex-item">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <a href="{% url 'status_view' %}" class="hex-content">
+                        <span class="hex-content-inner" style="color:#3d3025">
+                            <span class="icon">
+                                <i class="fa fa-gauge-high"></i>
+                            </span>
+                            <span>Monitoramento</span>
+                        </span>
+                        <svg class="p-2"  viewBox="0 0 173.20508075688772 200" height="200" width="174" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M86.60254037844386 0L173.20508075688772 50L173.20508075688772 150L86.60254037844386 200L0 150L0 50Z" fill="#a98467"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row position-absolute top-50 start-50 translate-middle menu2">
+            <div style="margin-top: 45%">
+                <div class="menu d-flex justify-content-center">
+                    <div class="hexagon-item">
+                        <div class="hex-item">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <a href="{% url 'books_view' %}" class="hex-content">
+                            <span class="hex-content-inner" style="color:#3d3025">
+                                <span class="icon">
+                                    <i class="fa fa-book"></i>
+                                </span>
+                                <span>Livros</span>
+                            </span>
+                            <svg class="p-2"  viewBox="0 0 173.20508075688772 200" height="200" width="174" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M86.60254037844386 0L173.20508075688772 50L173.20508075688772 150L86.60254037844386 200L0 150L0 50Z" fill="#a98467"></path></svg>
+                        </a>
+                    </div>
+                    <div class="hexagon-item">
+                        <div class="hex-item">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <a href="{% url 'users_view' %}" class="hex-content">
+                            <span class="hex-content-inner" style="color:#3d3025">
+                                <span class="icon">
+                                    <i class="fa fa-users"></i>
+                                </span>
+                                <span>Usuários</span>
+                            </span>
+                            <svg class="p-2" viewBox="0 0 173.20508075688772 200" height="200" width="174" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M86.60254037844386 0L173.20508075688772 50L173.20508075688772 150L86.60254037844386 200L0 150L0 50Z" fill="#a98467"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="">
+                <div class="menu d-flex justify-content-center">
+                    <div class="hexagon-item">
+                        <div class="hex-item">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <a href="{% url 'books_transaction_view' %}" class="hex-content">
+                            <span class="hex-content-inner" style="color:#3d3025">
+                                <span class="icon">
+                                    <i class="fa fa-handshake"></i>
+                                </span>
+                                <span>Emprestimos</span>
+                            </span>
+                            <svg class="p-2"  viewBox="0 0 173.20508075688772 200" height="200" width="174" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M86.60254037844386 0L173.20508075688772 50L173.20508075688772 150L86.60254037844386 200L0 150L0 50Z" fill="#a98467"></path></svg>
+                        </a>
+                    </div>
+                    <div class="hexagon-item">
+                        <div class="hex-item">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <a href="{% url 'status_view' %}" class="hex-content">
+                            <span class="hex-content-inner" style="color:#3d3025">
+                                <span class="icon">
+                                    <i class="fa fa-gauge-high"></i>
+                                </span>
+                                <span>Monitoramento</span>
+                            </span>
+                            <svg class="p-2"  viewBox="0 0 173.20508075688772 200" height="200" width="174" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M86.60254037844386 0L173.20508075688772 50L173.20508075688772 150L86.60254037844386 200L0 150L0 50Z" fill="#a98467"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

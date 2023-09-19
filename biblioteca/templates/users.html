@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block header %}
+<link rel="stylesheet" href="{% static 'css/users.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <!-- Delete modal -->
+
+        <div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Você tem certeza?</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Após a exclusão, não será possível recuperar os dados do usuário.
+                    </div>
+                    <div class="modal-footer">
+                        <a id="delete-confirm"><button type="button" class="btn btn-danger">Excluir</button></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit modal -->
+
+        <div class="modal fade" id="edit-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form id="form" method="POST">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="modal-title">Editar usuário</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Nome
+                            <input id="name" type="text" name="name" class="form-control" placeholder="" required><br>
+                            Celular
+                            <input id="phone" type="text" name="phone" class="form-control" placeholder=""><br>
+                            E-mail
+                            <input id="email" type="email" name="email" class="form-control" placeholder=""><br>
+                        </div>
+                        <div class="modal-footer">
+                            <a id="edit-confirm"><button type="submit" class="btn btn-success">Confirmar</button></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info modal -->
+
+        <div class="modal fade" id="info-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="modal-title">Histórico de emprestimos</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <table class="table table-hover text-center">
+                            <thead style="background-color: #3d3025; color: white">
+                                <tr>
+                                    <th scope="col">Livro</th>
+                                    <th scope="col">Emprestado em</th>
+                                    <th scope="col">Prazo de devolução</th>
+                                    <th scope="col">Entregue em</th>
+                                    <th scope="col">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8 mt-3">
+                <button class="btn btn-success col-12 create" data-bs-toggle="modal" data-bs-target="#edit-modal">Adicionar Usuário</button>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <table class="table table-hover text-center">
+                    <thead style="background-color: #3d3025; color: white">
+                        <tr>
+                            <th scope="col" style="width: 30%;">Nome</th>
+                            <th scope="col" style="width: 20%;">Celular</th>
+                            <th scope="col" style="width: 20%;">E-mail</th>
+                            <th scope="col" style="width: 20%;">Criado em</th>
+                            <th scope="col" style="width: 3%;"></th>
+                            <th scope="col" style="width: 3%;"></th>
+                            <th scope="col" style="width: 3%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-light">
+                    {% for user in users %}
+                        <tr>
+                            <td>{{user.name  |truncatechars:30}}</td>
+                            <td>{{user.phone |truncatechars:30}}</td>
+                            <td>{{user.email |truncatechars:30}}</td>
+                            <td>{{user.created_at|date:"d/m/Y"}}</td>
+                            <td>
+                                <a href="{{ user.id }}" class="info" data-bs-toggle="modal" data-bs-target="#info-modal"><svg width="23" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path clip-rule="evenodd" d="m12 3.75c-4.55635 0-8.25 3.69365-8.25 8.25 0 4.5563 3.69365 8.25 8.25 8.25 4.5563 0 8.25-3.6937 8.25-8.25 0-4.55635-3.6937-8.25-8.25-8.25zm-9.75 8.25c0-5.38478 4.36522-9.75 9.75-9.75 5.3848 0 9.75 4.36522 9.75 9.75 0 5.3848-4.3652 9.75-9.75 9.75-5.38478 0-9.75-4.3652-9.75-9.75zm9.75-.75c.4142 0 .75.3358.75.75v3.5c0 .4142-.3358.75-.75.75s-.75-.3358-.75-.75v-3.5c0-.4142.3358-.75.75-.75zm0-3.25c-.5523 0-1 .44772-1 1s.4477 1 1 1h.01c.5523 0 1-.44772 1-1s-.4477-1-1-1z" fill="#000000" fill-rule="evenodd"></path></g></svg></a>
+                            </td>
+                            <td>
+                                <a href="{% url 'users_edit' user.id %}" class="edit" data-bs-toggle="modal" data-bs-target="#edit-modal"><svg width="23" fill="#50470B" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg" transform="rotate(90)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M277.974 49.076c65.267-65.379 171.733-65.49 237.448 0l232.186 232.187 1055.697 1055.809L1919.958 1920l-582.928-116.653-950.128-950.015 79.15-79.15 801.792 801.68 307.977-307.976-907.362-907.474L281.22 747.65 49.034 515.464c-65.379-65.603-65.379-172.069 0-237.448Zm1376.996 1297.96-307.977 307.976 45.117 45.116 384.999 77.023-77.023-385-45.116-45.116ZM675.355 596.258l692.304 692.304-79.149 79.15-692.304-692.305 79.149-79.15ZM396.642 111.88c-14.33 0-28.547 5.374-39.519 16.345l-228.94 228.94c-21.718 21.718-21.718 57.318 0 79.149l153.038 153.037 308.089-308.09-153.037-153.036c-10.972-10.971-25.301-16.345-39.63-16.345Z" fill-rule="evenodd"></path> </g></svg></a>
+                            </td>
+                            <td>
+                                <a href="{% url 'users_delete' user.id %}" class="delete" data-bs-toggle="modal" data-bs-target="#delete-modal"><svg width="23" fill="#A40E1E" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M0 14.545L1.455 16 8 9.455 14.545 16 16 14.545 9.455 8 16 1.455 14.545 0 8 6.545 1.455 0 0 1.455 6.545 8z" fill-rule="evenodd"></path> </g></svg></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/jquery.inputmask.bundle.min.js"></script>
+    <script src="{% static 'js/users.js' %}"></script>
+{% endblock %}
