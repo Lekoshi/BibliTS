@@ -1,7 +1,77 @@
 <nav class="navbar navbar-expand-lg navbar-dark w-100" style="font-family: Nexa">
     <div class="container-fluid">
         {% if not user.is_authenticated %}
-            <a></a>
+        <div class="d-flex align-items-center justify-content-center">
+            <a href="#" id="accessibilityBtn" class="mr-4" style="color: #3d3025"><i class="fa-solid fa-universal-access fa-3x"></i></a>
+            <div id="accessibilityMenu" class="hidden" style="opacity: 0; visibility: hidden;">
+                <a id="increaseFontBtn" href="#" class="p-2 rounded-2 text-light mx-3" style="background-color: #a08269;"><i class="fa-solid fa-font">+</i></a>
+                <a id="decreaseFontBtn" href="#" class="p-2 rounded-2 text-light" style="background-color: #a08269;"><i class="fa-solid fa-font">-</i></a>
+            </div>
+        </div>
+
+        
+        <script>
+            let accessibilityBtn = document.getElementById("accessibilityBtn");
+
+            let accessibilityMenu = document.getElementById("accessibilityMenu");
+            let increaseFontBtn = document.getElementById("increaseFontBtn");
+            let decreaseFontBtn = document.getElementById("decreaseFontBtn");
+
+            let fontSize = 1;
+
+            increaseFontBtn.addEventListener("click", () => {
+                fontSize += 0.1;
+                document.body.style.transition = "all 0.3s ease-in-out";
+                document.body.style.fontSize   = fontSize + "em";
+                $(".btn").css("fontSize", fontSize + "em");
+        
+                let inputSize = fontSize * 4 + "em";
+                if (fontSize == 1) inputSize = "auto";
+
+                $("#search").css("height", inputSize).css("transition", "all 0.3s ease-in-out");
+                $("#category-filter").css("height", inputSize).css("transition", "all 0.3s ease-in-out");
+                $("#available-filter").css("height", inputSize).css("transition", "all 0.3s ease-in-out");
+            });
+            
+            decreaseFontBtn.addEventListener("click", () => {
+                fontSize -= 0.1;
+                document.body.style.transition = "all 0.3s ease-in-out";
+                document.body.style.fontSize   = fontSize + "em";
+                $(".btn").css("fontSize", fontSize + "em");
+
+                let inputSize = fontSize * 4 + "em";
+                if (fontSize <= 1) {
+                    inputSize = "auto"
+                    $("#search").css("fontSize", 1 + "em");
+                    $("#category-filter").css("fontSize", 1 + "em");
+                    $("#available-filter").css("fontSize", 1 + "em");
+                };
+
+                $("#search").css("height", inputSize).css("transition", "all 0.3s ease-in-out");
+                $("#category-filter").css("height", inputSize).css("transition", "all 0.3s ease-in-out");
+                $("#available-filter").css("height", inputSize).css("transition", "all 0.3s ease-in-out");
+            });
+
+            accessibilityBtn.addEventListener("click", () => {
+                accessibilityMenu.classList.toggle("hidden");
+                accessibilityMenu.style.transition = "all 0.3s ease-in-out";
+            
+                if(!accessibilityMenu.classList.contains("hidden")){
+                    accessibilityMenu.style.opacity = "1";
+                    accessibilityMenu.style.transform = "translateX(6%)";
+                    accessibilityMenu.style.visibility = "visible";
+                    accessibilityBtn.style.transform = "rotate(180deg)";
+                    accessibilityBtn.style.color = "#a08269";
+                }else{
+                    accessibilityMenu.style.opacity = "0";
+                    accessibilityMenu.style.transform = "translateX(0%)";
+                    accessibilityMenu.style.visibility = "hidden";
+                    accessibilityBtn.style.transform = "rotate(0deg)";
+                    accessibilityBtn.style.color = "#3d3025";
+                }
+            });
+        </script>
+
         {% else %}
 
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -33,4 +103,4 @@
         <button class="btn btn-outline-success px-4 py-2" data-bs-toggle="modal" data-bs-target="#login-modal" type="submit">Login</button>
         {% endif %}
     </div>
-  </nav>
+</nav>

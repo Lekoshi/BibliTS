@@ -123,7 +123,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ALLOWED_HOSTS = ['lekoshi.tech','panel.lekoshi.tech','0.0.0.0']
+ALLOWED_HOSTS = ['lekoshi.tech','panel.lekoshi.tech','0.0.0.0','127.0.0.1']
 
 # DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
 
