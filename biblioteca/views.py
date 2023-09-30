@@ -4,10 +4,15 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from django.core import serializers
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.forms.models import model_to_dict
 from django.db.models import Q
 from .models import Book, User, Transaction, Category
 from .forms import UserForm, BookForm, TransactionForm
+import pandas as pd
+import tempfile as tmp
+import os
+import fnmatch
 
 def home(request):
     if (not request.user.is_authenticated):
@@ -96,6 +101,63 @@ def books_transaction_delete(request, pk):
     transaction.active = False;
     transaction.save()
     return redirect('books_transaction_view')
+
+def books_transaction_report(request):
+    startDate = timezone.make_aware(parse_datetime(request.GET.get('s'))).astimezone(timezone.utc)
+    endDate   = timezone.make_aware(parse_datetime(request.GET.get('e'))).astimezone(timezone.utc) + timezone.timedelta(days=1)
+    available = request.GET.get('a')
+    
+    transactionsQuery = Transaction.objects.all().values('book_title', 'user__name', 'user__email', 'issued_on', 'due_date', 'return_date', 'active').order_by('-issued_on').filter(issued_on__range=[startDate, endDate])
+    
+    if(available == '1'):
+        transactionsQuery = transactionsQuery.filter(active=True)
+    elif(available == '0'):
+        transactionsQuery = transactionsQuery.filter(active=False)
+
+    transactions = list(transactionsQuery)
+    
+    data = {
+        'Responsável':        [],
+        'Livro':              [],
+        'Emprestado em':      [],
+        'Prazo de devolução': [],
+        'Estado':             []
+    }
+
+    for transaction in transactions:
+        transaction['due_date']  = transaction['due_date'].strftime("%d-%m-%Y")
+        transaction['issued_on'] = transaction['issued_on'].strftime("%d-%m-%Y")
+        if transaction['return_date'] != None:
+            transaction['return_date'] = transaction['return_date'].strftime("%d-%m-%Y")
+
+        data['Responsável'].append(transaction['user__name'])
+        data['Livro'].append(transaction['book_title'])
+        data['Emprestado em'].append(transaction['issued_on'])
+        data['Prazo de devolução'].append(transaction['due_date'])
+        if transaction['active']:
+            data['Estado'].append('Entregue')
+        else:
+            data['Estado'].append('Pendente')
+
+    df = pd.DataFrame(data)
+
+    tmpFileDir = 'media/tmp'
+    tmpFiles = os.listdir(tmpFileDir);
+    tmpFilesNumber = len(fnmatch.filter(tmpFiles, '*.*'))
+
+    if(tmpFilesNumber > 9):
+        oldestFile = min([tmpFileDir + '/' + f for f in tmpFiles], key=os.path.getctime)
+        os.remove(oldestFile)
+        print('Removed file: ' + oldestFile)
+        
+    with tmp.NamedTemporaryFile(mode='w', suffix='.xlsx', prefix='report', dir=tmpFileDir, delete=False) as tmpFile:
+        df.to_excel(tmpFile.name, index=False)
+    
+
+    downloadLink = tmpFileDir + '/report' + tmpFile.name.split('report')[-1]
+
+    return JsonResponse({'transactions': transactions, 'downloadLink': downloadLink }, content_type='application/json')
+
 
 #------------------ Books -----------------
 
@@ -268,8 +330,8 @@ def users_info(request, pk):
 
 def users_info_transactions(request, pk):
     transactions = list(Transaction.objects.filter(user=pk).values().order_by('-active'))
+    
     for transaction in transactions:
-        
         transaction['due_date']  = transaction['due_date'].strftime("%d-%m-%Y")
         transaction['issued_on'] = transaction['issued_on'].strftime("%d-%m-%Y")
         if transaction['return_date'] != None:

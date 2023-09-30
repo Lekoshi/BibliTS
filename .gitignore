@@ -1,3 +1,6 @@
 /.cache
 /.local
-/biblits/__pycache__
+biblits/__pycache__
+biblioteca/__init__.py
+biblioteca/migrations/__pycache__
+app.py

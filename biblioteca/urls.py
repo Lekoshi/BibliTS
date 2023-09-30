@@ -14,7 +14,7 @@ urlpatterns = [
     path('emprestimos',                  views.books_transaction_view,     name='books_transaction_view'),
     path('emprestimos/criar',            views.books_transaction_register, name='books_transaction_register'),
     path('emprestimos/deletar/<int:pk>', views.books_transaction_delete,   name='books_transaction_delete'),
-
+    path('emprestimos/relatorio',        views.books_transaction_report,   name='books_transaction_report'),
 
     #------------------------------------ Books ------------------------------------
 
