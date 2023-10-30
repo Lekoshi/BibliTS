@@ -70,6 +70,8 @@ function searchBook(){
                 let response = await fetch(request);
                 let responseObj = await response.json();
                 let book = responseObj.book;
+                
+                if (book == null) location.reload();
 
                 $("#title").val(book.title);
                 $("#author").val(book.author);
@@ -106,6 +108,8 @@ function searchBook(){
                 let response = await fetch(request);
                 let responseObj = await response.json();
 
+                if (responseObj.book == null) location.reload();
+
                 let name = responseObj.user.name;
                 let borrowDate = responseObj.transaction.issued_on;
                 let borrowDue = responseObj.transaction.due_date;
@@ -126,6 +130,8 @@ function searchBook(){
                 let responseObj = await response.json();
                 let book = responseObj.book;
                 
+                if (book == null || book.available == false) location.reload();
+
                 $("#title-borrow").val(book.title).attr("disabled", true);
                 $("#book-borrow").val(book.id);
             })();

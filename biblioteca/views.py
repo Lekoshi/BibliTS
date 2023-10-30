@@ -190,20 +190,28 @@ def books_edit(request, pk):
     return redirect('books_view')
 
 def books_delete(request, pk):
-    book = get_object_or_404(Book, pk=pk)
-    transactions = Transaction.objects.filter(book=pk)
+    try:
+        book = Book.objects.get(pk=pk)
+        transactions = Transaction.objects.filter(book=pk)
 
-    if transactions.count() > 0:
-        for t in transactions:
-            t.active = False
-            t.return_date = timezone.now()
-            t.save()
-       
-    book.delete()
+        if transactions.count() > 0:
+            for t in transactions:
+                t.active = False
+                t.return_date = timezone.now()
+                t.save()
+            
+        book.delete()
+    except Book.DoesNotExist:
+        pass
+
     return redirect('books_view')
 
 def books_info(request, pk):
     book = Book.objects.filter(pk=pk)
+
+    if book.count() == 0:
+        return JsonResponse({'book': None}, content_type='application/json')
+
     book_data = list(book.values('id', 'title', 'author', 'description', 'available', 'cover'))
 
     for b in book_data:
@@ -248,14 +256,15 @@ def books_search(request):
 def books_devolution(request, pk):
     book = get_object_or_404(Book, pk=pk)
 
-    transaction = get_object_or_404(Transaction, book=book)
-    transaction.active = False
-    transaction.book = None
-    transaction.return_date = timezone.now();
-    transaction.save()
-    
-    book.available = True
-    book.save()
+    if book.available == False:
+        transaction = get_object_or_404(Transaction, book=book)
+        transaction.active = False
+        transaction.book = None
+        transaction.return_date = timezone.now();
+        transaction.save()
+
+        book.available = True
+        book.save()
     
     return redirect('books_view')
 
@@ -265,24 +274,30 @@ def books_borrow(request):
 
         book = get_object_or_404(Book, pk=request.POST['book'])
 
-        form = TransactionForm({'book': request.POST['book'], 'user': request.POST['user'], 'due_date': due_date, 'book_title': book.title})
+        if book.available == True:
+            form = TransactionForm({'book': request.POST['book'], 'user': request.POST['user'], 'due_date': due_date, 'book_title': book.title})
 
-        if form.is_valid():
-            form.save()
-            book.available = False
-            book.save()
-        else:
-            print(TransactionForm.errors)
+            if form.is_valid():
+                form.save()
+                book.available = False
+                book.save()
+            else:
+                print(TransactionForm.errors)
     return redirect('books_view')
 
 def books_borrow_info(request, pk):
-    transactionObj = get_object_or_404(Transaction, book=pk)
+    try:
+        transactionObj = Transaction.objects.get(book=pk)
 
-    user        = model_to_dict(transactionObj.user)
-    book        = model_to_dict(transactionObj.book, exclude=['cover', 'category'])
-    transaction = model_to_dict(transactionObj)
-    transaction['due_date']  = transactionObj.due_date.strftime("%d-%m-%Y")
-    transaction['issued_on'] = transactionObj.issued_on.strftime("%d-%m-%Y")
+        user        = model_to_dict(transactionObj.user)
+        book        = model_to_dict(transactionObj.book, exclude=['cover', 'category'])
+        transaction = model_to_dict(transactionObj)
+        transaction['due_date']  = transactionObj.due_date.strftime("%d-%m-%Y")
+        transaction['issued_on'] = transactionObj.issued_on.strftime("%d-%m-%Y")
+    except Transaction.DoesNotExist:
+        user = None
+        book = None
+        transaction = None
 
     return JsonResponse({'transaction': transaction, 'user': user, 'book': book}, content_type='application/json')
 
@@ -315,30 +330,37 @@ def users_edit(request, pk):
     return redirect('users_view')
 
 def users_delete(request, pk):
-    user = get_object_or_404(User, pk=pk)
-    transactions = Transaction.objects.filter(user=user.id)
-    if transactions:
-        for transaction in transactions:
-            transaction.book.available = True
-            transaction.book.save()
-    user.delete()
+    try:
+        user = User.objects.get(pk=pk)
+        
+        transactions = Transaction.objects.filter(user=user.id)
+        if transactions:
+            for transaction in transactions:
+                transaction.book.available = True
+                transaction.book.save()
+        user.delete()
+    except User.DoesNotExist:
+        pass
     return redirect('users_view')
 
 
 def users_info(request, pk):
-    user = model_to_dict(get_object_or_404(User, pk=pk))
+    try:
+        user = model_to_dict(User.objects.get(pk=pk))
+    except User.DoesNotExist:
+        user = None
     
     return JsonResponse({'user': user})
 
 def users_info_transactions(request, pk):
     transactions = list(Transaction.objects.filter(user=pk).values().order_by('-active'))
-    
+
     for transaction in transactions:
         transaction['due_date']  = transaction['due_date'].strftime("%d-%m-%Y")
         transaction['issued_on'] = transaction['issued_on'].strftime("%d-%m-%Y")
         if transaction['return_date'] != None:
             transaction['return_date'] = transaction['return_date'].strftime("%d-%m-%Y")
-
+            
     return JsonResponse({'transactions': transactions})
 
 #------------------ Status ------------------

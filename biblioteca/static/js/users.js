@@ -22,6 +22,8 @@ $(document).ready(function() {
             let responseObj = await response.json();
             let user = responseObj.user;
             
+            if (user == null) location.reload();
+
             $("#modal-title").text("Editar usuário");
             $("#name").val(user.name);
             $("#phone").val(user.phone);
@@ -42,6 +44,8 @@ $(document).ready(function() {
             let responseObj = await response.json();
             let transactions = responseObj.transactions;
             
+            if (transactions == null) location.reload();
+
             transactions.forEach(transaction => {
 
                 let status = "";
