@@ -39,7 +39,8 @@ urlpatterns = [
 
     #------------------------------------ Status ------------------------------------
 
-    path('status',    views.status_view,     name='status_view'),
+    path('status',      views.status_view, name='status_view'),
+    path('status/info', views.status_info, name='status_info')
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

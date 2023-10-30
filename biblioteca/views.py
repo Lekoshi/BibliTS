@@ -116,6 +116,8 @@ def books_transaction_report(request):
 
     transactions = list(transactionsQuery)
     
+    transactionsCount = transactionsQuery.count()
+
     data = {
         'Responsável':        [],
         'Livro':              [],
@@ -123,7 +125,7 @@ def books_transaction_report(request):
         'Prazo de devolução': [],
         'Estado':             []
     }
-
+    
     for transaction in transactions:
         transaction['due_date']  = transaction['due_date'].strftime("%d-%m-%Y")
         transaction['issued_on'] = transaction['issued_on'].strftime("%d-%m-%Y")
@@ -156,7 +158,7 @@ def books_transaction_report(request):
 
     downloadLink = tmpFileDir + '/report' + tmpFile.name.split('report')[-1]
 
-    return JsonResponse({'transactions': transactions, 'downloadLink': downloadLink }, content_type='application/json')
+    return JsonResponse({'transactions': transactions, 'transactionsCount': transactionsCount,'downloadLink': downloadLink }, content_type='application/json')
 
 
 #------------------ Books -----------------
@@ -345,14 +347,34 @@ def status_view(request):
     if(not request.user.is_authenticated):
         return redirect('home')
     else:
-        users        = User.objects.all()
-        books        = Book.objects.all()
-        transactions = Transaction.objects.all().filter(active=True)
+        return render(request, 'status.html')
 
-        overdues = transactions.filter(due_date__lt=timezone.now().date())
-        warningDue = transactions.filter(due_date=timezone.now().date())
+def status_info(request):
+    users              = list(User.objects.all().values())
+    books              = list(Book.objects.all().values())
+    transactionsQuery  = Transaction.objects.all()
+    transactions       = list(transactionsQuery.values())
+
+    activeTransactionsQuery = transactionsQuery.filter(active=True)
+    activeTransactions = list(activeTransactionsQuery.values())
+
+    overduesQuery = activeTransactionsQuery.filter(due_date__lt=timezone.localtime().date())
+    overdues = list(overduesQuery.values('book_title', 'user__name', 'issued_on', 'due_date', 'return_date', 'active').order_by('due_date'))
+
+    warningsQuery = activeTransactionsQuery.filter(due_date=timezone.localtime().date())
+    warnings = list(warningsQuery.values('book_title', 'user__name', 'issued_on', 'due_date', 'return_date', 'active').order_by('due_date'))
+
+
+    for overdue in overdues:
+        overdue['days_late'] = (timezone.localtime().date() - overdue['due_date']).days
+        overdue['due_date']  = overdue['due_date'].strftime("%d/%m/%Y")
+
+    for warning in warnings:
+        warning['due_date']  = warning['due_date'].strftime("%d/%m/%Y")
     
-        for overdue in overdues:
-            overdue.days_late = (timezone.now().date() - overdue.due_date).days
+    transactionsPerMonth = []
 
-    return render(request, 'status.html', {'usersCount': users.count(), 'booksCount': books.count(), 'transactionsCount': transactions.count(), 'overdues': overdues, 'warningDue': warningDue})
+    for x in range(12):
+        transactionsPerMonth.append(transactionsQuery.filter(issued_on__month=x+1, issued_on__year=timezone.now().year).count())
+
+    return JsonResponse({'users': users, 'books': books, 'transactions': transactions, 'overdues': overdues, 'warnings': warnings, 'activeTransactions': activeTransactions, 'transactionsPerMonth': transactionsPerMonth, 'currentMonth': timezone.localtime().month})

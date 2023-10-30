@@ -20,7 +20,7 @@
                                 <i class="fa fa-book" style="scale: 2"></i>
                             </div>
                             <div class="col-8 col-sm-9 col-lg-10">
-                               <h3>{{ booksCount }}</h3>
+                               <h3><span id="books-count">0</span></h3>
                             </div>
                        </div>
                    </div>
@@ -37,7 +37,7 @@
                                 <i class="fa fa-users" style="scale: 2"></i>
                             </div>
                             <div class="col-8 col-sm-9 col-lg-10">
-                                <h3>{{ usersCount }}</h3>
+                                <h3><span id="users-count">0</span></h3>
                             </div>
                         </div>
                     </div>
@@ -54,11 +54,19 @@
                                 <i class="fa fa-handshake" style="scale: 2"></i>
                             </div>
                             <div class="col-8 col-sm-9 col-lg-10">
-                                <h3>{{ transactionsCount }}</h3>
+                                <h3><span id="transactions-count">0</span></h3>
                             </div>
                         </div>
                     </div>
                </div>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center mt-5">
+            <div class="col-12 col-lg-6 text-center">
+                <canvas id="chart1"></canvas>
+            </div>
+            <div class="col-12 mt-5 mt-lg-0 col-lg-6 text-center">
+                <canvas id="chart2"></canvas>
             </div>
         </div>
         <div class="row mt-5">
@@ -75,15 +83,17 @@
                             <th scope="col" style="width: 33%;">Tempo de atraso</th>
                         </tr>
                     </thead>
-                    <tbody class="table-light">
-                    {% for overdue in overdues %}
+                    <tbody id="overdues" class="table-light">
+                    <!--
+                        {% for overdue in overdues %}
                         <tr>
                             <td>{{overdue.user.name  | truncatechars:100 }}</td>
                             <td>{{overdue.book_title | truncatechars:100 }}</td>
                             <td>{{overdue.due_date   | date:"d/m/Y"      }}</td>
                             <td>{{overdue.days_late}} dias</td>
                         </tr>
-                        {% endfor %}
+                    {% endfor %}
+                    -->
                     </tbody>
                 </table>
             </div>
@@ -99,14 +109,16 @@
                             <th scope="col" style="width: 33%;">Prazo de devolução</th>
                         </tr>
                     </thead>
-                    <tbody class="table-light">
-                    {% for warningDue in warningDue %}
+                    <tbody id="warnings" class="table-light">
+                    <!--
+                        {% for warningDue in warningDue %}
                         <tr>
                             <td>{{warningDue.user.name  | truncatechars:100 }}</td>
                             <td>{{warningDue.book_title | truncatechars:100 }}</td>
                             <td>{{warningDue.due_date   | date:"d/m/Y"      }}</td>
                         </tr>
-                    {% endfor %}
+                        {% endfor %}
+                    -->
                     </tbody>
                 </table>
             </div>
@@ -114,4 +126,6 @@
     </div>
 
 <script src="{% static 'js/status.js' %}"></script>
+<script src="{% static 'js/chart.js'  %}"></script>
+
 {% endblock %}

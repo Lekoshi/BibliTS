@@ -22,9 +22,12 @@ $(document).ready(function() {
             
             let transactions = responseObj.transactions;
             let downloadLink = responseObj.downloadLink;
+            let transactionsCount = responseObj.transactionsCount;
 
             $("#report-transations").empty();
             $("#report-download").attr("href", downloadLink);
+
+            $("#transactions-count").text(transactionsCount);
 
             transactions.forEach(transaction => {
                 let status = "";
